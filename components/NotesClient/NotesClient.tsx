@@ -1,12 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import css from "./NotesClient.module.css";
 import type { NoteTag, NotesResponse } from "@/types/note";
+import { SearchBox } from "@/components/SearchBox/SearchBox";
+import { NoteForm } from "@/components/NoteForm/NoteForm";
+import { NoteList } from "@/components/NoteList/NoteList";
+import { Pagination } from "@/components/Pagination/Pagination";
 import {
   createNote,
   deleteNote,
@@ -134,16 +137,7 @@ export function NotesClient({
       <section className={css.panel}>
         <form onSubmit={handleFiltersSubmit}>
           <div className={css.filters}>
-            <label className={css.field}>
-              <span>Search</span>
-              <input
-                className={css.input}
-                type="text"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Find notes"
-              />
-            </label>
+            <SearchBox value={search} onChange={setSearch} />
 
             <label className={css.field}>
               <span>Tag</span>
@@ -181,102 +175,28 @@ export function NotesClient({
       </section>
 
       <section className={css.panel}>
-        <form onSubmit={handleCreateNote}>
-          <div className={css.filters}>
-            <label className={css.field}>
-              <span>Title</span>
-              <input className={css.input} name="title" type="text" required />
-            </label>
-
-            <label className={css.field}>
-              <span>Tag</span>
-              <select className={css.select} name="tag" defaultValue="Todo">
-                {tags
-                  .filter((tagOption) => tagOption !== "All")
-                  .map((tagOption) => (
-                    <option key={tagOption} value={tagOption}>
-                      {tagOption}
-                    </option>
-                  ))}
-              </select>
-            </label>
-
-            <label className={css.field}>
-              <span>Content</span>
-              <textarea className={css.textarea} name="content" />
-            </label>
-          </div>
-
-          <div className={css.actions}>
-            <button
-              type="submit"
-              className={css.primaryButton}
-              disabled={createMutation.isPending}
-            >
-              {createMutation.isPending ? "Saving..." : "Create note"}
-            </button>
-          </div>
-          {createError ? <p className={css.error}>{createError}</p> : null}
-        </form>
+        <NoteForm
+          tags={tags}
+          isSubmitting={createMutation.isPending}
+          error={createError}
+          onSubmit={handleCreateNote}
+        />
       </section>
 
       <section className={css.panel}>
-        {notes.length ? (
-          <div className={css.grid}>
-            {notes.map((note) => (
-              <article key={note.id} className={css.noteCard}>
-                <div>
-                  <p className={css.noteMeta}>{note.tag}</p>
-                  <h2 className={css.noteTitle}>{note.title}</h2>
-                </div>
-                <p className={css.noteText}>
-                  {note.content || "No content provided."}
-                </p>
-                <div className={css.footer}>
-                  <Link href={`/notes/${note.id}`} className={css.noteLink}>
-                    Open note
-                  </Link>
-                  <button
-                    type="button"
-                    className={css.dangerButton}
-                    onClick={() => deleteMutation.mutate(note.id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p className={css.empty}>
-            No notes found for the current filters yet.
-          </p>
-        )}
+        <NoteList
+          notes={notes}
+          deleteError={deleteError}
+          isDeleting={deleteMutation.isPending}
+          onDelete={(id) => deleteMutation.mutate(id)}
+        />
 
-        {deleteError ? <p className={css.error}>{deleteError}</p> : null}
-
-        <div className={css.actions}>
-          <button
-            type="button"
-            className={css.secondaryButton}
-            disabled={page <= 1}
-            onClick={() => updateRoute(search, tag, page - 1)}
-          >
-            Previous
-          </button>
-          <span>
-            Page {page} of {notesQuery.data.totalPages || 1}
-          </span>
-          <button
-            type="button"
-            className={css.secondaryButton}
-            disabled={page >= notesQuery.data.totalPages}
-            onClick={() => updateRoute(search, tag, page + 1)}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          page={page}
+          totalPages={notesQuery.data.totalPages}
+          onPrevious={() => updateRoute(search, tag, page - 1)}
+          onNext={() => updateRoute(search, tag, page + 1)}
+        />
       </section>
     </div>
   );
