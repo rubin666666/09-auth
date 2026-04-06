@@ -1,11 +1,9 @@
 "use client";
 
-import type { NotesResponse } from "@/types/note";
 import { NoteForm } from "@/components/NoteForm/NoteForm";
-import { NotesFilterClient } from "@/app/(private routes)/notes/filter/[...slug]/Notes.client";
+import { Notes } from "@/app/(private routes)/notes/filter/[...slug]/Notes.client";
 
 type NotesClientProps = {
-  initialData: NotesResponse;
   initialSearch: string;
   initialTag: string;
   page: number;
@@ -26,7 +24,6 @@ const tags = [
 ] as const;
 
 export function NotesClient({
-  initialData,
   initialSearch,
   initialTag,
   page,
@@ -36,12 +33,7 @@ export function NotesClient({
       <section style={{ marginBottom: 24 }}>
         <NoteForm tags={[...tags]} />
       </section>
-      <NotesFilterClient
-        initialData={initialData}
-        initialSearch={initialSearch}
-        initialTag={initialTag}
-        page={page}
-      />
+      <Notes initialSearch={initialSearch} initialTag={initialTag} page={page} />
     </>
   );
 }

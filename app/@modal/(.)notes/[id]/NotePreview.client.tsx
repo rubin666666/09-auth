@@ -12,18 +12,19 @@ type NotePreviewClientProps = {
 
 export function NotePreviewClient({ noteId }: NotePreviewClientProps) {
   const router = useRouter();
-  const { data: note } = useQuery({
+  const { data: note, isLoading, isError } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => fetchNoteById(noteId),
   });
 
-  if (!note) {
-    return null;
-  }
-
   return (
     <Modal onClose={() => router.back()}>
-      <NoteDetailsClient noteId={noteId} />
+      <button type="button" onClick={() => router.back()}>
+        Close preview
+      </button>
+      {isLoading ? <p>Loading note preview...</p> : null}
+      {isError ? <p>Failed to load note preview.</p> : null}
+      {note ? <NoteDetailsClient noteId={noteId} /> : null}
     </Modal>
   );
 }

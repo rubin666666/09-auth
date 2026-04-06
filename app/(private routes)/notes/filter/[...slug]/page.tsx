@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api/serverApi";
-import { NotesFilterClient } from "./Notes.client";
+import { Notes } from "./Notes.client";
 
 type FilterSlugPageProps = {
   params: Promise<{
@@ -16,17 +21,19 @@ export default async function FilterSlugPage({ params }: FilterSlugPageProps) {
     redirect("/notes");
   }
 
-  const initialData = await fetchNotes({ tag, page: 1, perPage: 12 });
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["notes", "", tag, 1],
+    queryFn: () => fetchNotes({ tag, page: 1, perPage: 12 }),
+  });
 
   return (
     <main style={{ flex: 1, padding: "32px 0 56px" }}>
       <div className="container">
-        <NotesFilterClient
-          initialData={initialData}
-          initialSearch=""
-          initialTag={tag}
-          page={1}
-        />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <Notes initialSearch="" initialTag={tag} page={1} />
+        </HydrationBoundary>
       </div>
     </main>
   );

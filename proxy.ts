@@ -49,7 +49,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const isAuthenticated = hasAccessToken || hasRefreshToken;
+  const isAuthenticated = hasAccessToken;
 
   const isPrivateRoute = privateRoutes.some((route) =>
     pathname.startsWith(route),

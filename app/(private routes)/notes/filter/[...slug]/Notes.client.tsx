@@ -10,11 +10,10 @@ import { NoteList } from "@/components/NoteList/NoteList";
 import { Pagination } from "@/components/Pagination/Pagination";
 import { fetchNotes } from "@/lib/api/clientApi";
 import { useNoteStore } from "@/lib/store/noteStore";
-import type { NoteTag, NotesResponse } from "@/types/note";
+import type { NoteTag } from "@/types/note";
 import css from "@/components/NotesClient/NotesClient.module.css";
 
-type NotesFilterClientProps = {
-  initialData: NotesResponse;
+type NotesProps = {
   initialSearch: string;
   initialTag: string;
   page: number;
@@ -34,12 +33,7 @@ const tags: NoteTag[] = [
   "Todo",
 ];
 
-export function NotesFilterClient({
-  initialData,
-  initialSearch,
-  initialTag,
-  page,
-}: NotesFilterClientProps) {
+export function Notes({ initialSearch, initialTag, page }: NotesProps) {
   const router = useRouter();
   const search = useNoteStore((state) => state.search);
   const tag = useNoteStore((state) => state.tag);
@@ -74,8 +68,10 @@ export function NotesFilterClient({
         page: currentPage,
         perPage: 12,
       }),
-    initialData,
   });
+
+  const notes = notesQuery.data?.notes ?? [];
+  const totalPages = notesQuery.data?.totalPages ?? 1;
 
   function updateRoute(nextSearch: string, nextTag: string, nextPage: number) {
     const params = new URLSearchParams();
@@ -143,13 +139,21 @@ export function NotesFilterClient({
       </section>
 
       <section className={css.panel}>
-        <NoteList notes={notesQuery.data.notes} />
-        <Pagination
-          page={currentPage}
-          totalPages={notesQuery.data.totalPages}
-          onPrevious={() => updateRoute(search, tag, currentPage - 1)}
-          onNext={() => updateRoute(search, tag, currentPage + 1)}
-        />
+        {notesQuery.isLoading ? <p>Loading notes...</p> : null}
+        {notesQuery.isError ? <p>Failed to load notes.</p> : null}
+        {!notesQuery.isLoading && !notesQuery.isError ? (
+          <>
+            {notes.length ? <NoteList notes={notes} /> : <p>No notes found.</p>}
+            {notes.length ? (
+              <Pagination
+                page={currentPage}
+                totalPages={totalPages}
+                onPrevious={() => updateRoute(search, tag, currentPage - 1)}
+                onNext={() => updateRoute(search, tag, currentPage + 1)}
+              />
+            ) : null}
+          </>
+        ) : null}
       </section>
     </div>
   );

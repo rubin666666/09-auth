@@ -10,13 +10,21 @@ type NoteDetailsClientProps = {
 };
 
 export function NoteDetailsClient({ noteId }: NoteDetailsClientProps) {
-  const { data: note } = useQuery({
+  const { data: note, isLoading, isError } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => fetchNoteById(noteId),
   });
 
+  if (isLoading) {
+    return <article className={css.card}>Loading note...</article>;
+  }
+
+  if (isError) {
+    return <article className={css.card}>Failed to load note.</article>;
+  }
+
   if (!note) {
-    return null;
+    return <article className={css.card}>Note not found.</article>;
   }
 
   return (
