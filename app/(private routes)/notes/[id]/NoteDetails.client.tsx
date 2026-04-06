@@ -1,14 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import type { Note } from "@/types/note";
+import { useQuery } from "@tanstack/react-query";
+import { fetchNoteById } from "@/lib/api/clientApi";
 import css from "./page.module.css";
 
 type NoteDetailsClientProps = {
-  note: Note;
+  noteId: string;
 };
 
-export function NoteDetailsClient({ note }: NoteDetailsClientProps) {
+export function NoteDetailsClient({ noteId }: NoteDetailsClientProps) {
+  const { data: note } = useQuery({
+    queryKey: ["note", noteId],
+    queryFn: () => fetchNoteById(noteId),
+  });
+
+  if (!note) {
+    return null;
+  }
+
   return (
     <article className={css.card}>
       <span className={css.tag}>{note.tag}</span>

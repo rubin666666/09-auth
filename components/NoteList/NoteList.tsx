@@ -1,20 +1,31 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Note } from "@/types/note";
+import { deleteNote, getErrorMessage } from "@/lib/api/clientApi";
 import css from "./NoteList.module.css";
 
 type NoteListProps = {
   notes: Note[];
-  deleteError: string;
-  isDeleting: boolean;
-  onDelete: (id: string) => void;
 };
 
-export function NoteList({
-  notes,
-  deleteError,
-  isDeleting,
-  onDelete,
-}: NoteListProps) {
+export function NoteList({ notes }: NoteListProps) {
+  const queryClient = useQueryClient();
+  const [deleteError, setDeleteError] = useState("");
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: async () => {
+      setDeleteError("");
+      await queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: (error) => {
+      setDeleteError(getErrorMessage(error));
+    },
+  });
+
   if (!notes.length) {
     return <p className={css.empty}>No notes found for the current filters yet.</p>;
   }
@@ -36,8 +47,8 @@ export function NoteList({
               <button
                 type="button"
                 className={css.dangerButton}
-                onClick={() => onDelete(note.id)}
-                disabled={isDeleting}
+                onClick={() => deleteMutation.mutate(note.id)}
+                disabled={deleteMutation.isPending}
               >
                 Delete
               </button>

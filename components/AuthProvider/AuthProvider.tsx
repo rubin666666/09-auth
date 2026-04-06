@@ -23,6 +23,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
+    router.refresh();
+  }, [router]);
+
+  useEffect(() => {
     let isMounted = true;
 
     async function syncAuthState() {
