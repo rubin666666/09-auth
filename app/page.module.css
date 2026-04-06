@@ -1,0 +1,66 @@
+.hero {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 48px 0 72px;
+}
+
+.panel {
+  width: min(860px, 100%);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(215, 223, 235, 0.9);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: 40px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+}
+
+.text {
+  margin: 18px 0 0;
+  max-width: 640px;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryLink {
+  background: var(--accent);
+  color: #fff;
+}
+
+.secondaryLink {
+  border: 1px solid var(--border);
+  background: #fff;
+}

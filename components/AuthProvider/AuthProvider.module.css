@@ -1,0 +1,16 @@
+.overlay {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 40px 0;
+}
+
+.loader {
+  padding: 16px 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  color: var(--text-main);
+  font-weight: 600;
+}
